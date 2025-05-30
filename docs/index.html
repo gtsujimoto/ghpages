@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロジェクトドキュメント</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .links {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .link-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            width: 45%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .link-card h2 {
+            margin-top: 0;
+            color: #444;
+        }
+        .link-card a {
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #2962ff;
+            font-weight: bold;
+        }
+        .link-card a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>プロジェクトドキュメント</h1>
+    <p>プロジェクトの各部分に関するドキュメントへのリンクです。</p>
+    
+    <div class="links">
+        <div class="link-card">
+            <h2>バックエンド</h2>
+            <p>バックエンドのAPI仕様、データモデル、その他技術ドキュメント</p>
+            <a href="./backend/">バックエンドドキュメントを見る →</a>
+        </div>
+        
+        <div class="link-card">
+            <h2>フロントエンド</h2>
+            <p>フロントエンドのコンポーネント構造、状態管理、その他技術ドキュメント</p>
+            <a href="./frontend/">フロントエンドドキュメントを見る →</a>
+        </div>
+    </div>
+</body>
+</html> 

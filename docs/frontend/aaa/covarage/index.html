@@ -1,0 +1,398 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>server: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">practice/cmd/server/main.go (0.0%)</option>
+				
+				<option value="file1">practice/domain/usecase/user_usecase.go (100.0%)</option>
+				
+				<option value="file2">practice/infrastructure/persistence/user_repository.go (100.0%)</option>
+				
+				<option value="file3">practice/infrastructure/router/router.go (100.0%)</option>
+				
+				<option value="file4">practice/interfaces/controller/user_controller.go (85.7%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "fmt"
+        "log"
+        "net/http"
+        "practice/domain/usecase"
+        "practice/infrastructure/persistence"
+        "practice/infrastructure/router"
+        "practice/interfaces/controller"
+)
+
+func main() <span class="cov0" title="0">{
+        // Create repository
+        userRepository := persistence.NewInMemoryUserRepository()
+
+        // Create usecase
+        userUsecase := usecase.NewUserUsecase(userRepository)
+
+        // Create controller
+        userController := controller.NewUserController(userUsecase)
+
+        // Create router
+        r := router.NewRouter(userController)
+
+        // Start server
+        port := 8080
+        fmt.Printf("Server starting on port %d...\n", port)
+        log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), r))
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package usecase
+
+import (
+        "practice/domain/entity"
+        "practice/domain/repository"
+)
+
+// UserUsecase defines the methods for user use cases
+type UserUsecase interface {
+        GetAll() ([]*entity.User, error)
+        GetByID(id int) (*entity.User, error)
+        Create(user *entity.User) (*entity.User, error)
+}
+
+// userUsecase implements UserUsecase
+type userUsecase struct {
+        userRepo repository.UserRepository
+}
+
+// NewUserUsecase creates a new user usecase with the given repository
+func NewUserUsecase(repo repository.UserRepository) UserUsecase <span class="cov8" title="1">{
+        return &amp;userUsecase{
+                userRepo: repo,
+        }
+}</span>
+
+// GetAll returns all users
+func (u *userUsecase) GetAll() ([]*entity.User, error) <span class="cov8" title="1">{
+        return u.userRepo.FindAll()
+}</span>
+
+// GetByID returns a user by ID
+func (u *userUsecase) GetByID(id int) (*entity.User, error) <span class="cov8" title="1">{
+        return u.userRepo.FindByID(id)
+}</span>
+
+// Create creates a new user
+func (u *userUsecase) Create(user *entity.User) (*entity.User, error) <span class="cov8" title="1">{
+        return u.userRepo.Create(user)
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package persistence
+
+import (
+        "fmt"
+        "practice/domain/entity"
+        "practice/domain/repository"
+        "sync"
+)
+
+// InMemoryUserRepository is an in-memory implementation of the UserRepository interface
+type InMemoryUserRepository struct {
+        mutex sync.RWMutex
+        users map[int]*entity.User
+        maxID int
+}
+
+// NewInMemoryUserRepository creates a new in-memory user repository
+func NewInMemoryUserRepository() repository.UserRepository <span class="cov8" title="1">{
+        // Initialize with some sample users
+        users := map[int]*entity.User{
+                1: {ID: 1, Name: "User 1"},
+                2: {ID: 2, Name: "User 2"},
+        }
+
+        return &amp;InMemoryUserRepository{
+                users: users,
+                maxID: 2,
+        }
+}</span>
+
+// FindAll returns all users
+func (r *InMemoryUserRepository) FindAll() ([]*entity.User, error) <span class="cov8" title="1">{
+        r.mutex.RLock()
+        defer r.mutex.RUnlock()
+
+        users := make([]*entity.User, 0, len(r.users))
+        for _, user := range r.users </span><span class="cov8" title="1">{
+                users = append(users, user)
+        }</span>
+        <span class="cov8" title="1">return users, nil</span>
+}
+
+// FindByID returns a user by ID
+func (r *InMemoryUserRepository) FindByID(id int) (*entity.User, error) <span class="cov8" title="1">{
+        r.mutex.RLock()
+        defer r.mutex.RUnlock()
+
+        user, ok := r.users[id]
+        if !ok </span><span class="cov8" title="1">{
+                return nil, nil // User not found, but not an error
+        }</span>
+        <span class="cov8" title="1">return user, nil</span>
+}
+
+// Create creates a new user
+func (r *InMemoryUserRepository) Create(user *entity.User) (*entity.User, error) <span class="cov8" title="1">{
+        r.mutex.Lock()
+        defer r.mutex.Unlock()
+
+        // Auto-increment ID if not provided
+        if user.ID == 0 </span><span class="cov8" title="1">{
+                r.maxID++
+                user.ID = r.maxID
+        }</span>
+
+        // Check if user with this ID already exists
+        <span class="cov8" title="1">if _, exists := r.users[user.ID]; exists </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("user with ID %d already exists", user.ID)
+        }</span>
+
+        // Store the user
+        <span class="cov8" title="1">r.users[user.ID] = user
+        return user, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package router
+
+import (
+        "net/http"
+        "practice/interfaces/controller"
+        "strings"
+)
+
+// Router handles HTTP routing
+type Router struct {
+        userController *controller.UserController
+}
+
+// NewRouter creates a new router
+func NewRouter(userController *controller.UserController) *Router <span class="cov8" title="1">{
+        return &amp;Router{
+                userController: userController,
+        }
+}</span>
+
+// ServeHTTP implements the http.Handler interface
+func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) <span class="cov8" title="1">{
+        path := req.URL.Path
+        method := req.Method
+
+        // Health check endpoint
+        if path == "/health" &amp;&amp; method == http.MethodGet </span><span class="cov8" title="1">{
+                w.WriteHeader(http.StatusOK)
+                w.Write([]byte("OK"))
+                return
+        }</span>
+
+        // Users endpoints
+        <span class="cov8" title="1">if path == "/users" &amp;&amp; method == http.MethodGet </span><span class="cov8" title="1">{
+                r.userController.GetUsers(w, req)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if path == "/users" &amp;&amp; method == http.MethodPost </span><span class="cov8" title="1">{
+                r.userController.CreateUser(w, req)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if strings.HasPrefix(path, "/users/") &amp;&amp; method == http.MethodGet </span><span class="cov8" title="1">{
+                r.userController.GetUser(w, req)
+                return
+        }</span>
+
+        // Handle 404 Not Found
+        <span class="cov8" title="1">w.WriteHeader(http.StatusNotFound)
+        w.Write([]byte("Not Found"))</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package controller
+
+import (
+        "encoding/json"
+        "net/http"
+        "practice/domain/entity"
+        "practice/domain/usecase"
+        "strconv"
+        "strings"
+)
+
+// UserController handles HTTP requests related to users
+type UserController struct {
+        userUsecase usecase.UserUsecase
+}
+
+// NewUserController creates a new user controller
+func NewUserController(u usecase.UserUsecase) *UserController <span class="cov8" title="1">{
+        return &amp;UserController{
+                userUsecase: u,
+        }
+}</span>
+
+// GetUsers handles GET requests to retrieve all users
+func (uc *UserController) GetUsers(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        users, err := uc.userUsecase.GetAll()
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+                return
+        }</span>
+
+        <span class="cov8" title="1">w.Header().Set("Content-Type", "application/json")
+        if err := json.NewEncoder(w).Encode(users); err != nil </span><span class="cov0" title="0">{
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+        }</span>
+}
+
+// GetUser handles GET requests to retrieve a user by ID
+func (uc *UserController) GetUser(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // Simple path parsing to get ID (in a real app, use a router that provides this)
+        path := strings.TrimPrefix(r.URL.Path, "/users/")
+        id, err := strconv.Atoi(path)
+        if err != nil </span><span class="cov8" title="1">{
+                http.Error(w, "Invalid user ID", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">user, err := uc.userUsecase.GetByID(id)
+        if err != nil </span><span class="cov8" title="1">{
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+                return
+        }</span>
+        <span class="cov8" title="1">if user == nil </span><span class="cov8" title="1">{
+                http.Error(w, "User not found", http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">w.Header().Set("Content-Type", "application/json")
+        if err := json.NewEncoder(w).Encode(user); err != nil </span><span class="cov0" title="0">{
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+        }</span>
+}
+
+// CreateUser handles POST requests to create a new user
+func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var user entity.User
+        if err := json.NewDecoder(r.Body).Decode(&amp;user); err != nil </span><span class="cov8" title="1">{
+                http.Error(w, err.Error(), http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">newUser, err := uc.userUsecase.Create(&amp;user)
+        if err != nil </span><span class="cov8" title="1">{
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+                return
+        }</span>
+
+        <span class="cov8" title="1">w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusCreated)
+        if err := json.NewEncoder(w).Encode(newUser); err != nil </span><span class="cov0" title="0">{
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+        }</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
